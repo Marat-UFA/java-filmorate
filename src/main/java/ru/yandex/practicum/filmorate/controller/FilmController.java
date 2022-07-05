@@ -1,11 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +28,8 @@ public class FilmController {
     private int id;
 
     @PostMapping(value = "/films")
-    Film saveFilm(@RequestBody Film film) throws ValidationException {
-        setId(getId()+1);
+    Film saveFilm(@Valid @RequestBody Film film) throws ValidationException {
+        setId(id+1);
         film.setId(getId());
         validate(film);
         log.info("Фильм добавлен");
@@ -37,7 +37,7 @@ public class FilmController {
         return film;
     }
     @PutMapping(value = "/films")
-    Film updateFilm(@RequestBody Film film) throws ValidationException {
+    Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
         validate(film);
         for (int i=0; i < films.size(); i++){
             if (films.get(i).getId() == film.getId()){
@@ -69,15 +69,6 @@ public class FilmController {
             throw new ValidationException("id < 0");
         }
 
-        if (film.getName().isEmpty() || film.getName().isBlank()){
-            throw new ValidationException("Название не может быть пустым");
-        }
-
-        if (film.getDescription().length()>200){
-            film.setDescription(film.getDescription().substring(0, 200));
-            throw new ValidationException("Длина описания сокращена до 200 символов");
-        }
-
         if (film.getReleaseDate() == null){
             throw new ValidationException("Дата не указана");
         }
@@ -86,9 +77,6 @@ public class FilmController {
             throw new ValidationException("Дата релиза — не может быть раньше 1895-12-28");
         }
 
-        if (film.getDuration() <= 0){
-            throw new ValidationException("Продолжительность фильма должна быть положительной.");
-        }
     }
 
 }

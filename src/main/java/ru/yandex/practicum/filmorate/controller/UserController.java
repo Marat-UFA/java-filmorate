@@ -27,7 +27,7 @@ public class UserController {
 
     @PostMapping(value = "/users")
     User saveUser(@RequestBody User user) throws ValidationException {
-        setId(getId()+1);
+        setId(id+1);
         user.setId(getId());
         validate(user);
         log.info("Пользователь добавлен");
@@ -61,10 +61,6 @@ public class UserController {
 
         if (user.getEmail() == null || !user.getEmail().contains("@")) {
             throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
-        }
-
-        if (user.getLogin().isEmpty() || user.getLogin().isBlank() || user.getLogin().contains(" ")){
-            throw new ValidationException("логин не может быть пустым и содержать пробелы");
         }
 
         if (user.getName().isEmpty() || user.getName().isBlank()){

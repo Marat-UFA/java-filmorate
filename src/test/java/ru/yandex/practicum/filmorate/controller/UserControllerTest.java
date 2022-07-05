@@ -35,19 +35,6 @@ class UserControllerTest {
         }
     }
 
-    @Test
-    public void createNewUserBadLoginTest() {
-        User user = new User (2,"asd@mail.ru","131 321","qwerty", LocalDate.parse("06.06.2022", DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        UserController userController = new UserController();
-        try {
-            userController.validate (user);
-        } catch (ValidationException e) {
-            System.out.println("Проверка на не верный логин. Сообщение: ");
-            ValidationException validationException = new ValidationException(e.getMessage());
-            assertEquals(validationException.toString(),"логин не может быть пустым и содержать пробелы",
-                    "Не верно указан логин");
-        }
-    }
 
     @Test
     public void createNewUserBadBirthdayTest() {
