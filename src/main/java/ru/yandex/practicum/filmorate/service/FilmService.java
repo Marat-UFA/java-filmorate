@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 
@@ -14,10 +16,10 @@ import java.util.Collection;
 public class FilmService {
 
     @Autowired
-    InMemoryUserStorage userStorage;
+    UserStorage userStorage;
 
     @Autowired
-    InMemoryFilmStorage filmStorage;
+    FilmStorage filmStorage;
 
 
     public void addLike(int filmId, int userId) {
