@@ -1,61 +1,75 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+
 
 
 @RestController
 @Slf4j
+@RequestMapping("users")
 public class UserController {
 
-    private final List<User> users = new ArrayList<>();
+    @Autowired
+    UserService userService;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    private int id;
-
-    @PostMapping(value = "/users")
+    @PostMapping()
     User saveUser(@RequestBody User user) throws ValidationException {
-        setId(id+1);
-        user.setId(getId());
         validate(user);
-        log.info("Пользователь добавлен");
-        users.add(user);
-        return user;
+        User saved = userService.save(user);
+        return saved;
     }
-    @PutMapping(value = "/users")
+
+    @PutMapping()
     User updateUser(@RequestBody User user) throws ValidationException {
         validate(user);
-        for (int i=0; i < users.size(); i++){
-            if (users.get(i).getId() == user.getId()){
-                users.get(i).setEmail(user.getEmail());
-                users.get(i).setLogin(user.getLogin());
-                users.get(i).setName(user.getName());
-                users.get(i).setBirthday(user.getBirthday());
-                log.info("Ползователь обновлен");
-                return user;
-            }
-        }
-        users.add(user);
-        return user;
+        User update = userService.update(user);
+        return update;
     }
 
-    @GetMapping("/users")
-    public List<User> findAll() {
-        log.debug("Текущее количество пользователей: {}", users.size());
-        return users;
+    @GetMapping("/{userId}")
+    User getUser (@PathVariable int userId){
+        log.info("Get user by id={}",userId);
+        return userService.get(userId);
     }
+
+    @GetMapping()
+    Collection<User> getAllUser (){
+        return userService.getAllUser();
+    }
+
+    @GetMapping("/{userId}/friends")
+    Collection<User>  getAllFriends (@PathVariable int userId){
+        log.info("Get all friends user by id={}",userId);
+        return userService.getAllFriends(userId);
+    }
+
+    @GetMapping("/{userId}/friends/common/{otherId}")
+    Collection<User>  getMutualFriends (@PathVariable int userId, @PathVariable int otherId){
+        log.info("Get all mutual friends user by id= " + userId + " with user by id= " + otherId);
+        return userService.getMutualFriends(userId, otherId);
+    }
+
+
+
+    @PutMapping("/{userId}/friends/{friendId}")
+    public void addFriend (@PathVariable int userId, @PathVariable int friendId){
+        userService.addFriend(userId, friendId);
+    }
+
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public void deleteFriend (@PathVariable int userId, @PathVariable int friendId){
+        userService.deleteFriend(userId, friendId);
+    }
+
 
     void validate (User user) throws ValidationException {
 
@@ -70,10 +84,5 @@ public class UserController {
         if (user.getBirthday().isAfter(LocalDate.now())){
             throw new ValidationException("дата рождения не может быть в будущем");
         }
-
-        if (user.getId()<=0){
-            throw new ValidationException("id < 0");
-        }
     }
-
 }

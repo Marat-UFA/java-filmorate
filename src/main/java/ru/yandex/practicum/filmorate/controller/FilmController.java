@@ -1,73 +1,82 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 
 @RestController
 @Slf4j
+@RequestMapping("films")
 public class FilmController {
 
-    private final List<Film> films = new ArrayList<>();
+    private int count = 0;
 
-    public int getId() {
-        return id;
-    }
+    @Autowired
+    FilmService filmService;
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    private int id;
-
-    @PostMapping(value = "/films")
+    @PostMapping()
     Film saveFilm(@Valid @RequestBody Film film) throws ValidationException {
-        setId(id+1);
-        film.setId(getId());
         validate(film);
-        log.info("Фильм добавлен");
-        films.add(film);
-        return film;
+        Film saved = filmService.save(film);
+        return saved;
     }
-    @PutMapping(value = "/films")
+
+    @PutMapping()
     Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
         validate(film);
-        for (int i=0; i < films.size(); i++){
-            if (films.get(i).getId() == film.getId()){
-                films.get(i).setName(film.getName());
-                films.get(i).setDescription(film.getDescription());
-                films.get(i).setReleaseDate(film.getReleaseDate());
-                films.get(i).setDuration(film.getDuration());
-                log.info("Фильм обновлен");
-                return film;
-            }
-        }
-        films.add(film);
-        return film;
+        Film update = filmService.update(film);
+        return update;
     }
 
-    @GetMapping("/films")
-    public List<Film> findAll() {
-        log.debug("Текущее количество фильмов: {}", films.size());
-        return films;
+    @GetMapping("/{filmId}")
+    Film getFilm (@PathVariable int filmId){
+        log.info("Get film by id={}",filmId);
+        return filmService.getFilm(filmId);
     }
+    @GetMapping("/popular")
+    @ResponseBody
+    Collection<Film> getFilmPopularWithCount (@RequestParam (defaultValue = "null") String count){
+        if (count.equals("null")){
+            return filmService.getFilmPopular();
+        } else {
+            return filmService.getFilmPopularWithCount(Integer.parseInt(count));
+        }
+    }
+
+    @GetMapping("/popular1")
+    Collection<Film> getFilmPopular (){
+        return filmService.getFilmPopular();
+    }
+
+
+
+    @GetMapping()
+    Collection<Film> getAllFilm (){
+        return filmService.getAllFilm();
+    }
+
+    @PutMapping("/{filmId}/like/{userId}")
+    public void addLike (@PathVariable int filmId, @PathVariable int userId){
+        filmService.addLike(filmId, userId);
+    }
+
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public void deleteLike (@PathVariable int filmId, @PathVariable int userId){
+        filmService.deleteLike(filmId, userId);
+    }
+
+
 
     void validate (Film film) throws ValidationException {
 
-        if (film.getId()==null) {
-            throw new ValidationException("id пустой");
-        }
-
-        if (film.getId()<0){
-            throw new ValidationException("id < 0");
-        }
 
         if (film.getReleaseDate() == null){
             throw new ValidationException("Дата не указана");
