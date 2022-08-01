@@ -1,14 +1,17 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-
+import java.util.HashSet;
+import java.util.Set;
 
 
 @AllArgsConstructor
 @Data
+@NoArgsConstructor
     public class Film {
 
     private Integer id;
@@ -30,6 +33,10 @@ import java.time.LocalDate;
 
     @Min(1)
     private int duration;
+
+    @JsonIgnore
+    Set<Integer> userID = new HashSet<>();
+
     }
 
 
