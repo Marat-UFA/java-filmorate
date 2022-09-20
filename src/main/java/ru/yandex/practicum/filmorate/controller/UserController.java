@@ -11,13 +11,10 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import java.time.LocalDate;
 import java.util.Collection;
 
-
-
 @RestController
 @Slf4j
 @RequestMapping("users")
 public class UserController {
-
     @Autowired
     UserService userService;
 
@@ -58,8 +55,6 @@ public class UserController {
         return userService.getMutualFriends(userId, otherId);
     }
 
-
-
     @PutMapping("/{userId}/friends/{friendId}")
     public void addFriend (@PathVariable int userId, @PathVariable int friendId){
         userService.addFriend(userId, friendId);
@@ -70,17 +65,14 @@ public class UserController {
         userService.deleteFriend(userId, friendId);
     }
 
-
     void validate (User user) throws ValidationException {
 
         if (user.getEmail() == null || !user.getEmail().contains("@")) {
             throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
         }
-
         if (user.getName().isEmpty() || user.getName().isBlank()){
             user.setName(user.getLogin());
         }
-
         if (user.getBirthday().isAfter(LocalDate.now())){
             throw new ValidationException("дата рождения не может быть в будущем");
         }

@@ -2,8 +2,6 @@ package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.User;
 
-import ru.yandex.practicum.filmorate.model.User;
-
 import java.util.Collection;
 
 public interface UserStorage {
@@ -11,11 +9,13 @@ public interface UserStorage {
     User get (int UserId);
     User save (User user);
     User update (User user);
-    void addFriend(User user, User friend);
-    void deleteFriend(User user, User friend);
+    void addFriend(int userId, int friendId);
+    void deleteFriend(int userId, int friendId);
     Collection<User> getAllUser ();
-    Collection<User> getAllFriends(User user);
-    Collection<User> getMutualFriends(User user, User friend);
-
+    Collection<User> getAllFriends(int userId);
+    Collection<User> getMutualFriends(int userId, int friendId);
+    boolean checkingUser(int id);
+    void deleteUser (int UserId);
+    void deleteAllFriendsByUser(int UserId);
 
 }
