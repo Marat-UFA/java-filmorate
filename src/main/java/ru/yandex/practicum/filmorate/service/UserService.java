@@ -17,8 +17,6 @@ public class UserService {
     public UserService(@Qualifier("DbUserStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
-//    @Qualifier("DbUserStorage")
-//    private UserStorage userStorage;
 
     public User get(int userId) {
 

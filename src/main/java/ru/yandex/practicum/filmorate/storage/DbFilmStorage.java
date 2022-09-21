@@ -71,6 +71,7 @@ public class DbFilmStorage implements FilmStorage{
             film.setMpa(mpa);
             genreImpl.deleteGenresInFilm(film.getId());
             genreImpl.saveGenres(film);
+            film.setGenres(genreImpl.getAllGenresByIdWithFilm(film.getId()));
         } else {
             save(film);
         }
@@ -108,6 +109,11 @@ public class DbFilmStorage implements FilmStorage{
     }
 
     @Override
+    public List<Genre> getGenresByIdFilm(int id) {
+        return genreImpl.getAllGenresByIdWithFilm(id);
+    }
+
+    @Override
     public List<Genre> getAllGenres(){
         return genreImpl.getAllGenres();
 
@@ -130,4 +136,5 @@ public class DbFilmStorage implements FilmStorage{
     public List<Mpa> getAllMpa() {
         return mpaImpl.getAllMpa();
     }
+
 }

@@ -56,15 +56,6 @@ import java.util.Set;
         this.mpa = mpa;
         this.rating = rating;
     }
-//    public Film(String Film_name, String description, LocalDate releaseDate, int duration, Mpa mpa,
-//                int rating) {
-//        this.name = Film_name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//        this.mpa = mpa;
-//        this.rating = rating;
-//    }
 }
 
 

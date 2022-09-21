@@ -113,9 +113,24 @@ public class FilmService {
         return filmStorage.getGenreById(id);
     }
 
+    public Genre getAllGenreById(int id) {
+        if (id <= 0) {
+            throw new NotFoundException("Genre Id < 0");
+        }
+        return filmStorage.getGenreById(id);
+    }
+
+    public List<Genre> getAllGenreByIdFilm(int id) {
+        if (id <= 0) {
+            throw new NotFoundException("Film Id < 0");
+        }
+        return filmStorage.getGenresByIdFilm(id);
+    }
+
     public List<Genre> getAllGenres() {
         return filmStorage.getAllGenres();
     }
+
 
     public Mpa getMpaById(int id) {
         if (id <= 0) {

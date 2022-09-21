@@ -19,9 +19,9 @@ public interface FilmStorage {
     Collection<Film> getFilmPopularWithCount(int count);
     Collection<Film> getFilmPopular(int count);
     Genre getGenreById(int id);
+    List<Genre> getGenresByIdFilm(int id);
     List<Genre> getAllGenres();
     boolean checkingFilm(int id);
     Mpa getMpaById(int id);
     List<Mpa> getAllMpa();
-
 }

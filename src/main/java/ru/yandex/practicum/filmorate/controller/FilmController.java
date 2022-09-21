@@ -25,7 +25,6 @@ public class FilmController {
     @PostMapping()
     Film saveFilm(@Valid @RequestBody Film film) throws ValidationException {
         validate(film);
-        System.out.println(film);
         return filmService.save(film);
     }
 

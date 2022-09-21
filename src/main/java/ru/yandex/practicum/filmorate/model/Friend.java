@@ -9,7 +9,6 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@Builder
 public class Friend {
     private int userId;
     private int friendId;

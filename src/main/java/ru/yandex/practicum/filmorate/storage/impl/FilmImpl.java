@@ -2,10 +2,8 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.object.SqlQuery;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -20,10 +18,12 @@ import java.util.List;
 @Component
 public class FilmImpl implements FilmDao {
     private final JdbcTemplate jdbcTemplate;
+    private GenreImpl genreImpl;
 
     @Autowired
-    public FilmImpl(JdbcTemplate jdbcTemplate) {
+    public FilmImpl(JdbcTemplate jdbcTemplate, GenreImpl genreImpl) {
         this.jdbcTemplate = jdbcTemplate;
+        this.genreImpl=genreImpl;
     }
 
 
@@ -79,8 +79,11 @@ public class FilmImpl implements FilmDao {
     public Collection<Film> getAllFilms() {
         String sqlQuery = "SELECT f.*, m.mpa_name " +
                 "FROM FILMS as f Join MPA as m ON f.mpa_id=m.mpa_id ";
-        Collection<Film> filmRows = jdbcTemplate.query(sqlQuery, FilmImpl::makeFilm);
-
+        List<Film> filmRows = jdbcTemplate.query(sqlQuery, FilmImpl::makeFilm);
+        List<Film> filmRowsNew = null;
+        for (Film film: filmRows) {
+            film.setGenres(genreImpl.getAllGenresByIdWithFilm(film.getId()));
+        }
         return filmRows;
 
     }
@@ -91,14 +94,11 @@ public class FilmImpl implements FilmDao {
                 rs.getString("DESCRIPTION"),
                 rs.getDate("RELEASE_DATE").toLocalDate(),
                 rs.getInt("DURATION"),
-                //rs.getInt("MPA_ID")
                 new Mpa(rs.getInt("MPA_ID"),
                         rs.getString("MPA_NAME")),
                 rs.getInt("RATING")
         );
     }
-
-
 
     @Override
     public Film updateFilm(Film film) {
