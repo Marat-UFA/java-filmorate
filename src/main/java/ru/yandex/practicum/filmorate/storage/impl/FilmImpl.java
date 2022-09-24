@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.Exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.dao.FilmDao;
+import ru.yandex.practicum.filmorate.storage.dao.GenreDao;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ import java.util.List;
 @Component
 public class FilmImpl implements FilmDao {
     private final JdbcTemplate jdbcTemplate;
-    private GenreImpl genreImpl;
+    private GenreDao genreImpl;
 
     @Autowired
     public FilmImpl(JdbcTemplate jdbcTemplate, GenreImpl genreImpl) {
@@ -76,7 +77,7 @@ public class FilmImpl implements FilmDao {
     }
 
     @Override
-    public Collection<Film> getAllFilms() {
+    public List<Film> getAllFilms() {
         String sqlQuery = "SELECT f.*, m.mpa_name " +
                 "FROM FILMS as f Join MPA as m ON f.mpa_id=m.mpa_id ";
         List<Film> filmRows = jdbcTemplate.query(sqlQuery, FilmImpl::makeFilm);
@@ -115,7 +116,7 @@ public class FilmImpl implements FilmDao {
     }
 
     @Override
-    public Collection<Film> getFilmPopular(int count) {
+    public List<Film> getFilmPopular(int count) {
         String sqlQuery = "SELECT f.*, m.mpa_name " +
                 "FROM FILMS as f Join MPA as m ON f.mpa_id=m.mpa_id " +
                 "GROUP BY film_id " +

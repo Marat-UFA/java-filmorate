@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 
 @RestController
@@ -24,12 +25,14 @@ public class FilmController {
 
     @PostMapping()
     Film saveFilm(@Valid @RequestBody Film film) throws ValidationException {
+        log.info("save new film");
         validate(film);
         return filmService.save(film);
     }
 
     @PutMapping()
     Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
+        log.info("update film by name: {}", film.getName());
         validate(film);
         return filmService.update(film);
     }
@@ -47,7 +50,8 @@ public class FilmController {
     }
     @GetMapping("/popular")
     @ResponseBody
-    Collection<Film> getFilmPopular (@RequestParam (defaultValue = "null") String count){
+    List<Film> getFilmPopular (@RequestParam (defaultValue = "null") String count){
+        log.info("Get popular film");
         if (count.equals("null")){
             return filmService.getFilmPopular(10);
         } else {
@@ -56,17 +60,20 @@ public class FilmController {
     }
 
     @GetMapping()
-    Collection<Film> getAllFilm (){
+    List<Film> getAllFilm (){
+        log.info("Get all films");
         return filmService.getAllFilm();
     }
 
     @PutMapping("/{filmId}/like/{userId}")
     public void addLike (@PathVariable int filmId, @PathVariable int userId){
+        log.info("Add like of user id= {} for film id ={}", userId, filmId);
         filmService.addLike(filmId, userId);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
     public void deleteLike (@PathVariable int filmId, @PathVariable int userId){
+        log.info("Delete like of user id= {} for film id ={}", userId, filmId);
         filmService.deleteLike(filmId, userId);
     }
 

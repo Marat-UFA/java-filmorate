@@ -8,13 +8,10 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.impl.FilmImpl;
-import ru.yandex.practicum.filmorate.storage.impl.GenreImpl;
-import ru.yandex.practicum.filmorate.storage.impl.LikeImpl;
-import ru.yandex.practicum.filmorate.storage.impl.MpaImpl;
-
-
-import java.util.Collection;
+import ru.yandex.practicum.filmorate.storage.dao.FilmDao;
+import ru.yandex.practicum.filmorate.storage.dao.GenreDao;
+import ru.yandex.practicum.filmorate.storage.dao.LikeDao;
+import ru.yandex.practicum.filmorate.storage.dao.MpaDao;
 import java.util.List;
 
 @Component
@@ -22,14 +19,14 @@ import java.util.List;
 public class DbFilmStorage implements FilmStorage{
 
     private JdbcTemplate jdbcTemplate;
-    private FilmImpl filmImpl;
-    private LikeImpl likeImpl;
-    private MpaImpl mpaImpl;
-    private GenreImpl genreImpl;
+    private FilmDao filmImpl;
+    private LikeDao likeImpl;
+    private MpaDao mpaImpl;
+    private GenreDao genreImpl;
 
 
     @Autowired
-    public DbFilmStorage(JdbcTemplate jdbcTemplate, FilmImpl filmImpl, LikeImpl likeImpl, MpaImpl mpaImpl, GenreImpl genreImpl) {
+    public DbFilmStorage(JdbcTemplate jdbcTemplate, FilmDao filmImpl, LikeDao likeImpl, MpaDao mpaImpl, GenreDao genreImpl) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmImpl=filmImpl;
         this.likeImpl=likeImpl;
@@ -89,17 +86,12 @@ public class DbFilmStorage implements FilmStorage{
     }
 
     @Override
-    public Collection<Film> getAllFilm() {
+    public List<Film> getAllFilm() {
         return filmImpl.getAllFilms();
     }
 
     @Override
-    public Collection<Film> getFilmPopularWithCount(int count) {
-        return null;
-    }
-
-    @Override
-    public Collection<Film> getFilmPopular(int count) {
+    public List<Film> getFilmPopular(int count) {
         return filmImpl.getFilmPopular(count);
     }
 

@@ -58,12 +58,11 @@ public class FilmService {
         filmStorage.deleteLike(filmId, userId);
     }
 
-    public Collection<Film> getAllFilm() {
+    public List<Film> getAllFilm() {
         return filmStorage.getAllFilm();
     }
 
     public Film save(Film film) {
-
         return filmStorage.save(film);
     }
 
@@ -95,14 +94,7 @@ public class FilmService {
         filmStorage.deleteFilm(filmId);
     }
 
-    public Collection<Film> getFilmPopularWithCount(int count) {
-        if (count <= 0) {
-            throw new NotFoundException("Film with count <= 0");
-        }
-        return filmStorage.getFilmPopularWithCount(count);
-    }
-
-    public Collection<Film> getFilmPopular(int count) {
+    public List <Film> getFilmPopular(int count) {
         return filmStorage.getFilmPopular(count);
     }
 

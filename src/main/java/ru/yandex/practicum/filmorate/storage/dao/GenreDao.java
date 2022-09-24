@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface GenreDao {
     void saveGenres(Film film);
-    List<Genre> getAllGenresByIdWithFilm(Integer id);
-    void deleteGenresInFilm(Integer id);
-    Genre getGenreById(Integer id);
+    List<Genre> getAllGenresByIdWithFilm(int id);
+    void deleteGenresInFilm(int id);
+    Genre getGenreById(int id);
     List<Genre> getAllGenres();
 }

@@ -7,11 +7,11 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import ru.yandex.practicum.filmorate.storage.dao.GenreDao;
+import ru.yandex.practicum.filmorate.storage.dao.GenresListDao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,33 +20,22 @@ public class GenreImpl implements GenreDao {
 
 
     private final JdbcTemplate jdbcTemplate;
+    private GenresListDao genresListImpl;
 
     @Autowired
-    public GenreImpl(JdbcTemplate jdbcTemplate) {
+    public GenreImpl(JdbcTemplate jdbcTemplate, GenresListDao genresListImpl) {
         this.jdbcTemplate = jdbcTemplate;
+        this.genresListImpl = genresListImpl;
     }
 
     @Override
     public void saveGenres(Film film) {
-        String sqlQuery = "INSERT INTO GENRES_LIST (film_id, genre_id) " +
-                "VALUES (" + film.getId() + ", ?)";
-        List<Genre> genres = film.getGenres();
-        if (genres != null) {
-            Set<Genre> setGenres = new HashSet<>(genres);
-            genres = new ArrayList<>(setGenres);
-            film.setGenres(genres);
-            for (Genre genre : genres) {
-               jdbcTemplate.update(sqlQuery, genre.getId());
-            }
-        }
+        genresListImpl.saveGenres(film);
     }
 
     @Override
-    public List<Genre> getAllGenresByIdWithFilm(Integer genreid) {
-        String sqlQuery = "select genre_id " +
-                "from GENRES_LIST " +
-                "where film_id = ?";
-        Set<Integer> set = new HashSet<>(jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> rs.getInt("genre_id")), genreid));
+    public List<Genre> getAllGenresByIdWithFilm(int filmId) {
+        Set<Integer> set = genresListImpl.getAllGenresByIdWithFilm(filmId);
         List<Genre> genre = new ArrayList<>();
         for (Integer genreId: set) {
             genre.add(getGenreById( genreId));
@@ -55,11 +44,8 @@ public class GenreImpl implements GenreDao {
     }
 
     @Override
-    public void deleteGenresInFilm(Integer id) {
-        String sqlQuery = "DELETE " +
-                "FROM GENRES_LIST " +
-                "WHERE film_id = ?";
-        jdbcTemplate.update(sqlQuery, id);
+    public void deleteGenresInFilm(int id) {
+        genresListImpl.deleteGenresInFilm(id);
     }
 
 
@@ -70,7 +56,7 @@ public class GenreImpl implements GenreDao {
     }
 
     @Override
-    public Genre getGenreById(Integer genreid) {
+    public Genre getGenreById(int genreid) {
         String sqlQuery = "select * " +
                 "from GENRE "+
                 "where genre_id = ?";

@@ -8,19 +8,19 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class UserService {
 
     private UserStorage userStorage;
+
     @Autowired
     public UserService(@Qualifier("DbUserStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
     public User get(int userId) {
-
-
         if (userId <= 0) {
             throw new NotFoundException("userId < 0");
         }
@@ -42,7 +42,7 @@ public class UserService {
         return userStorage.update(user);
     }
 
-    public Collection<User> getAllUser() {
+    public List<User> getAllUser() {
         return userStorage.getAllUser();
     }
 

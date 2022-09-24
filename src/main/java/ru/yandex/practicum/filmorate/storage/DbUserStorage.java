@@ -7,9 +7,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.dao.FriendDao;
 
 import java.sql.*;
 import java.sql.Date;
@@ -22,15 +22,16 @@ public class DbUserStorage implements UserStorage{
 
 
     private final JdbcTemplate jdbcTemplate;
+    private FriendDao friendImpl;
 
     @Autowired
-    public DbUserStorage(JdbcTemplate jdbcTemplate) {
+    public DbUserStorage(JdbcTemplate jdbcTemplate, FriendDao friendImpl) {
         this.jdbcTemplate = jdbcTemplate;
+        this.friendImpl=friendImpl;
     }
 
     @Override
     public User get(int UserId) {
-
 
         String sqlQuery = "select user_id, user_name, login, email, birthday " +
                 "from USERS where user_id = ?";
@@ -79,7 +80,6 @@ public class DbUserStorage implements UserStorage{
         String sqlQuery = "update USERS set " +
                 "user_name = ?, login = ?, email = ?, birthday = ? " +
                 "where user_id = ?";
-
         jdbcTemplate.update(sqlQuery
                 , user.getName()
                 , user.getLogin()
@@ -91,20 +91,16 @@ public class DbUserStorage implements UserStorage{
 
     @Override
     public void addFriend(int userId, int friendId) {
-        String sqlQuery = "insert into FRIENDS (USER_ID, FRIEND_ID, STATUS) values (?, ?, ?)";
-        Boolean status = false;
-        jdbcTemplate.update(sqlQuery, userId, friendId, status);
-    }
+        friendImpl.addUserWithFriend(userId, friendId);
+   }
 
     @Override
     public void deleteFriend(int userId, int friendId) {
-            String sqlQuery = "delete from FRIENDS" +
-                    " where user_id = "+ userId + "and friend_id = " + friendId;
-            jdbcTemplate.update(sqlQuery);
+        friendImpl.deleteUserWithFriend(userId, friendId);
     }
 
     @Override
-    public Collection<User> getAllUser() {
+    public List<User> getAllUser() {
         String sqlQuery = "select user_id, user_name, login, email, birthday " +
                 "from USERS";
         List<User> users = jdbcTemplate.query(sqlQuery, DbUserStorage::makeUser);
@@ -113,26 +109,23 @@ public class DbUserStorage implements UserStorage{
 
     @Override
     public Collection<User> getAllFriends(int userId) {
-        String sqlQuery = "select user_id, friend_id " +
-                "from FRIENDS " +
-                "where user_id = " + userId + "or (friend_id = " + userId + " and  status = true)";
-        final List<Friend> listUserId = jdbcTemplate.query(sqlQuery, DbUserStorage::makeFriend);
+
+       final List<Friend> listFriendsId = friendImpl.getAllFriends(userId);
 
         List friendsListID = new ArrayList();
 
-        for (int i=0; i<listUserId.size(); i++){
-            if (listUserId.get(i).getUserId() == userId) {
-                friendsListID.add(listUserId.get(i).getFriendId());
+        for (int i=0; i<listFriendsId.size(); i++){
+            if (listFriendsId.get(i).getUserId() == userId) {
+                friendsListID.add(listFriendsId.get(i).getFriendId());
             }
-            if (listUserId.get(i).getFriendId() == userId) {
-                friendsListID.add(listUserId.get(i).getUserId());
+            if (listFriendsId.get(i).getFriendId() == userId) {
+                friendsListID.add(listFriendsId.get(i).getUserId());
             }
-
         }
 
         Set<User> userFriends = new HashSet<>();
         for (int i=0; i<friendsListID.size(); i++){
-            sqlQuery = "select user_id, user_name, login, email, birthday " +
+            String sqlQuery = "select user_id, user_name, login, email, birthday " +
                     "from USERS where user_id = ?";
             final List<User> users = jdbcTemplate.query(sqlQuery, DbUserStorage::makeUser, friendsListID.get(i));
             userFriends.add(users.get(0));
@@ -143,15 +136,10 @@ public class DbUserStorage implements UserStorage{
     @Override
     public Collection<User> getMutualFriends(int userId, int friendId) {
 
-        String sqlQuery = "select user_id, friend_id " +
-                "from FRIENDS " +
-                "where user_id = " + userId + "or (friend_id = " + userId + " and  status = true) or user_id = "
-                + friendId + " or (friend_id = " + friendId + " and  status = true)";
-
-        final List<Friend> listUserIdWithFriendId = jdbcTemplate.query(sqlQuery, DbUserStorage::makeFriend);
+        final List<Friend> listUserIdWithFriendId = friendImpl.getAllFriendsAndUser(userId, friendId);
         User user = new User();
         Friend friend = new Friend();
-        for (int i=0; i<listUserIdWithFriendId.size(); i++){
+        for (int i = 0; i < listUserIdWithFriendId.size(); i++){
 
             if (listUserIdWithFriendId.get(i).getUserId() == userId) {
                 user.getFriendID().add(listUserIdWithFriendId.get(i).getFriendId());
@@ -177,12 +165,14 @@ public class DbUserStorage implements UserStorage{
         }
 
         Set<User> userFriends = new HashSet<>();
-        for (int i=0; i<friendsListID.size(); i++){
-            sqlQuery = "select user_id, user_name, login, email, birthday " +
+        for (int i = 0; i < friendsListID.size(); i++){
+            String sqlQuery = "select user_id, user_name, login, email, birthday " +
                     "from USERS where user_id = ?";
             final List<User> users = jdbcTemplate.query(sqlQuery, DbUserStorage::makeUser, friendsListID.get(i));
             userFriends.add(users.get(0));
+
         }
+        System.out.println(userFriends);
         return userFriends;
     }
 
@@ -195,25 +185,17 @@ public class DbUserStorage implements UserStorage{
     }
 
     @Override
-    public void deleteUser(int UserId) {
-        deleteAllFriendsByUser(UserId);
+    public void deleteUser(int userId) {
+        deleteAllFriendsByUser(userId);
         String sqlQuery = "DELETE " +
                 "FROM USERS " +
                 "WHERE user_id = ?";
-        jdbcTemplate.update(sqlQuery, UserId);
+        jdbcTemplate.update(sqlQuery, userId);
     }
 
     @Override
-    public void deleteAllFriendsByUser(int UserId) {
-        String sqlQuery = "DELETE " +
-                "FROM FRIENDS " +
-                "WHERE user_id = ?";
-        jdbcTemplate.update(sqlQuery, UserId);
+    public void deleteAllFriendsByUser(int userId) {
+        friendImpl.deleteAllFriendsByUser(userId);
     }
 
-    static Friend makeFriend(ResultSet rs, int rowNum) throws SQLException {
-        return new Friend(rs.getInt("USER_ID"),
-                rs.getInt("FRIEND_ID")
-        );
-    }
 }

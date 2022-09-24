@@ -9,8 +9,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
-
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -26,26 +24,31 @@ public class MpaGenreController {
 
     @GetMapping("/mpa/{id}")
     public Mpa getMpaById(@PathVariable int id) {
+        log.info("Get mpa by id ={}", id);
         return filmService.getMpaById(id);
     }
 
     @GetMapping("/genres/{id}")
     public Genre getGenreById(@PathVariable int id) {
+        log.info("Get genre by id ={}", id);
         return filmService.getGenreById(id);
     }
 
     @GetMapping("/mpa")
     public List<Mpa> getAllMpa() {
+        log.info("Get all mpa");
         return filmService.getAllMpa();
     }
 
     @GetMapping("/genres")
     public List<Genre> getAllGenres() {
+        log.info("Get all genres");
         return filmService.getAllGenres();
     }
 
     @GetMapping("/genres/films")
-    Collection<Film> getAllFilm (){
+    List<Film> getAllFilm (){
+        log.info("Get film all with genre");
         return filmService.getAllFilm();
     }
 
