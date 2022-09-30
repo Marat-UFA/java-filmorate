@@ -6,21 +6,19 @@ import lombok.*;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
-@AllArgsConstructor
 @Data
-@NoArgsConstructor
+@RequiredArgsConstructor
     public class Film {
 
     private Integer id;
 
-    @NotNull
-    @NotBlank
-    @NotEmpty
+    @NotNull(message = "Название фильма не может быть null")
+    @NotBlank(message = "Название фильма не может быть пустым.")
     private String name;
-
 
     @NotNull
     @NotBlank
@@ -35,8 +33,29 @@ import java.util.Set;
     private int duration;
 
     @JsonIgnore
-    Set<Integer> userID = new HashSet<>();
+    private Set<Integer> likeList = new HashSet<>();
 
+    private List<Genre> genres;
+
+    private Mpa mpa;
+
+
+    public int getRating() {
+        return 0;
     }
+
+    private int rating = 0;
+
+    public Film(int Film_id, String Film_name, String description, LocalDate releaseDate, int duration, Mpa mpa,
+                int rating) {
+        this.id = Film_id;
+        this.name = Film_name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = mpa;
+        this.rating = rating;
+    }
+}
 
 
